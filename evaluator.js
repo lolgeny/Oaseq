@@ -1,5 +1,6 @@
 var token = require('./token');
-var so = require('./stackobject')
+var so = require('./stackobject');
+var fc = require('./functions');
 module.exports = {
   evaluate: (tokens, stack, currentList) => {
     tokens.forEach((t, index) => {
@@ -16,77 +17,37 @@ module.exports = {
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num + b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                sum = a.value+b.value;
-                currentList.push(new so.stackobject(sum));
-              }
-              //a:array + b:num
-              if (a.type == so.stacktype.ARRAY && b.type == so.stacktype.NUMBER) {
-                result = a.value.map(val => new so.stackobject(val.value + b.value, val.type));
-                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
-              }
-              //a:num + b:array
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.ARRAY) {
-                result = b.value.map(val => new so.stackobject(val.value + a.value, val.type));
-                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
-              }
-              //a:array + b:array
-              // BUG: does not return correct stack at end
-              if (a.type == so.stacktype.ARRAY && b.type == so.stacktype.ARRAY) {
-                result = a.value + b.value;
-                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
-              }
+              currentList.push(fc['+'](a,b));
               break;
             case '-':
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num - b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                difference = a.value-b.value;
-                currentList.push(new so.stackobject(difference));
-              }
+              currentList.push(fc['-'](a,b));
               break;
             case '*':
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num * b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                product = a.value*b.value;
-                currentList.push(new so.stackobject(product));
-              }
+              currentList.push(fc['*'](a,b));
               break;
             case '/':
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num / b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                ans = a.value/b.value;
-                currentList.push(new so.stackobject(ans));
-              }
+              currentList.push(fc['*'](a,b));
               break;
             case '%':
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num mod b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                ans = a.value%b.value;
-                currentList.push(new so.stackobject(ans));
-              }
+              currentList.push(fc['%'](a,b));
               break;
             case '^':
             //arity 2
               b = stack.pop();
               a = stack.pop();
-              //a:num^b:num
-              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.NUMBER) {
-                pow = Math.pow(a.value,b.value);
-                currentList.push(new so.stackobject(pow));
-              }
+              currentList.push(fc['^'](a,b));
               break;
             case '_':
             //arity 1
@@ -114,7 +75,7 @@ module.exports = {
               a = stack.pop().value;
               i = tokens[index+1].value;
               tokens.splice(index+1, 1);
-              currentList.push(new so.stackobject(a * Math.pow(10, i)));
+              currentList.push(fc.e(a, i));
               break;
             case '(':
             //arity 1
