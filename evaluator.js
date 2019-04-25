@@ -21,8 +21,22 @@ module.exports = {
                 sum = a.value+b.value;
                 currentList.push(new so.stackobject(sum));
               }
-              /*//a:array + b:num
-              if (typeof a == 'number' && typeof b == 'object')*/
+              //a:array + b:num
+              if (a.type == so.stacktype.ARRAY && b.type == so.stacktype.NUMBER) {
+                result = a.value.map(val => new so.stackobject(val.value + b.value, val.type));
+                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
+              }
+              //a:num + b:array
+              if (a.type == so.stacktype.NUMBER && b.type == so.stacktype.ARRAY) {
+                result = b.value.map(val => new so.stackobject(val.value + a.value, val.type));
+                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
+              }
+              //a:array + b:array
+              // BUG: does not return correct stack at end
+              if (a.type == so.stacktype.ARRAY && b.type == so.stacktype.ARRAY) {
+                result = a.value + b.value;
+                currentList.push(new so.stackobject(result, so.stacktype.ARRAY));
+              }
               break;
             case '-':
             //arity 2
